@@ -1,0 +1,45 @@
+@page "/lists/{id:int}"
+@using LetMeDo.Models
+
+<PageTitle>@Model.Title</PageTitle>
+
+<h1>@Model.Title</h1>
+
+<EditForm Model="@todo" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="title" @bind-Value="todo.Title" />
+
+    <button type="submit">Add</button>
+</EditForm>
+
+<ul>
+    @foreach (var item in Model.Items)
+    {
+        <li>@item.Title</li>
+    }
+</ul>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private TodoList Model { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Model = AppState.Lists.FirstOrDefault(x => x.Id == Id, new TodoList());
+    }
+
+    private TodoItem todo = new();
+
+    private void HandleValidSubmit()
+    {
+        todo.Id = Model.Items.Count + 1;
+        todo.Done = false;
+        
+        Model.Items.Add(todo);
+    }
+}
